@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Riwayat Treatment</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Base */
+    :root{
+      --surface:#fff;
+      --border:#e6ebee;
+      --text:#11292a;
+      --muted:#6b7c7d;
+      --accent:#1a686a;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:Poppins, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      color:var(--text); background:#f7f6f2; line-height:1.45;
+    }
+    .wrap{max-width:720px;margin:24px auto;padding:0 16px}
+    h1{font-size:20px;margin:0 0 12px 2px}
+
+    /* FILTER BAR */
+    .filterbar{position:sticky;top:0;background:#fff;padding:8px 12px;display:flex;gap:8px;
+      overflow-x:auto;border:1px solid var(--border); border-radius:12px; margin:10px 0 18px}
+    .filterbar::-webkit-scrollbar{display:none}
+    .chip{flex:0 0 auto;appearance:none;border:1px solid var(--border);background:#f8fafb;
+      padding:8px 12px;border-radius:999px;cursor:pointer;font-weight:600}
+    .chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .chip.ghost{background:transparent}
+    .chip.outline{background:#fff}
+    .sep{width:1px;background:var(--border);margin:0 2px}
+    .hidden{display:none !important}
+
+    /* Card shell */
+    .history-card{
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:14px;
+      box-shadow:0 6px 18px rgba(17,24,39,.06);
+      max-width:560px;
+    }
+
+    /* Header */
+    .hc-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+    .hc-title{font-weight:700;font-size:16px}
+    .hc-sub{color:var(--muted);font-size:12px;margin-top:2px}
+    .hc-actions{display:flex;gap:8px;align-items:center}
+    .badge{
+      background:#eef7f7;color:#136666;border:1px solid #d9efef;
+      padding:4px 8px;border-radius:999px;font-size:12px
+    }
+    .icon-btn{
+      appearance:none;border:1px solid var(--border);background:#f6f8f9;
+      width:32px;height:32px;border-radius:10px;display:grid;place-items:center;cursor:pointer
+    }
+
+    /* Items: name | durasi | qty */
+    .hc-items{list-style:none;margin:8px 0 10px;padding:0;display:grid;gap:8px}
+    .hc-items li{
+      display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:10px
+    }
+    .name{font-weight:600}
+    .chip-mini{
+      font-size:12px;color:var(--muted);background:#fbfbfb;border:1px solid var(--border);
+      padding:3px 8px;border-radius:999px
+    }
+    .qty{min-width:34px;text-align:right;font-weight:700}
+
+    /* Footer total */
+    .hc-foot{
+      display:flex;justify-content:space-between;align-items:center;
+      color:var(--muted);font-size:13px;border-top:1px dashed var(--border);padding-top:8px
+    }
+    .hc-foot .total b{color:var(--text)}
+
+    /* spacing */
+    .stack{display:grid;gap:16px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Riwayat Treatment</h1>
+
+    <!-- FILTER BAR -->
+    <div class="filterbar" id="filterBar">
+      <button class="chip active" data-filter="all">Semua</button>
+      <button class="chip" data-filter="fav">⭐ Favorit</button>
+      <span class="sep"></span>
+      <button class="chip" data-filter="area:UE">UE</button>
+      <button class="chip" data-filter="area:LE">LE</button>
+      <button class="chip" data-filter="area:Back">Punggung</button>
+      <button class="chip" data-filter="area:Neck">Leher</button>
+      <span class="sep"></span>
+      <button class="chip" data-filter="type:manual">Manual</button>
+      <button class="chip" data-filter="type:electro">Elektro</button>
+      <button class="chip" data-filter="type:thermal">Panas/Dingin</button>
+      <button class="chip" data-filter="type:exercise">Exercise</button>
+      <span class="sep"></span>
+      <button class="chip ghost" id="sortBtn" data-sort="duration">Sort Durasi</button>
+      <button class="chip outline" id="moreBtn">Filter…</button>
+    </div>
+
+    <div id="list" class="stack">
+      <!-- Card 1 (contoh) -->
+      <div class="history-card"
+           data-area="UE" data-type="electro" data-duration="60" data-fav="1">
+        <div class="hc-head">
+          <div>
+            <div class="hc-title">Transaksi</div>
+            <div class="hc-sub">14 Mei 2025 • 16:30</div>
+          </div>
+          <div class="hc-actions">
+            <span class="badge">Selesai</span>
+            <button class="icon-btn" title="Lihat detail" aria-label="Lihat detail">
+              <!-- magnifier -->
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <ul class="hc-items">
+          <li>
+            <span class="name">Motor UE1</span>
+            <span class="chip-mini">30 mnt</span>
+            <span class="qty">×1</span>
+          </li>
+          <li>
+            <span class="name">Motor UE2</span>
+            <span class="chip-mini">30 mnt</span>
+            <span class="qty">×1</span>
+          </li>
+        </ul>
+
+        <div class="hc-foot">
+          <span class="note">Catatan: —</span>
+          <span class="total">Total <b>60 mnt</b></span>
+        </div>
+      </div>
+
+      <!-- Duplikasi kartu lain & sesuaikan data-* untuk demo filter -->
+      <div class="history-card"
+           data-area="Back" data-type="manual" data-duration="45" data-fav="0">
+        <div class="hc-head">
+          <div>
+            <div class="hc-title">Transaksi</div>
+            <div class="hc-sub">10 Mei 2025 • 09:00</div>
+          </div>
+          <div class="hc-actions">
+            <span class="badge">Selesai</span>
+            <button class="icon-btn" title="Lihat detail" aria-label="Lihat detail">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <ul class="hc-items">
+          <li><span class="name">Massage Punggung</span><span class="chip-mini">45 mnt</span><span class="qty">×1</span></li>
+        </ul>
+        <div class="hc-foot"><span class="note">Catatan: —</span><span class="total">Total <b>45 mnt</b></span></div>
+      </div>
+
+      <div class="history-card"
+           data-area="LE" data-type="thermal" data-duration="90" data-fav="0">
+        <div class="hc-head">
+          <div>
+            <div class="hc-title">Transaksi</div>
+            <div class="hc-sub">7 Mei 2025 • 11:15</div>
+          </div>
+          <div class="hc-actions">
+            <span class="badge">Selesai</span>
+            <button class="icon-btn" title="Lihat detail" aria-label="Lihat detail">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <ul class="hc-items">
+          <li><span class="name">Kompres Dingin LE</span><span class="chip-mini">30 mnt</span><span class="qty">×1</span></li>
+          <li><span class="name">Terapi Panas LE</span><span class="chip-mini">60 mnt</span><span class="qty">×1</span></li>
+        </ul>
+        <div class="hc-foot"><span class="note">Catatan: —</span><span class="total">Total <b>90 mnt</b></span></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const bar = document.getElementById('filterBar');
+    const list = document.getElementById('list');
+    const cards = () => Array.from(list.querySelectorAll('.history-card'));
+    let sortAsc = true;
+
+    bar.addEventListener('click', (e) => {
+      const btn = e.target.closest('.chip'); if(!btn) return;
+
+      // Sorting
+      if(btn.id === 'sortBtn'){
+        sortAsc = !sortAsc;
+        btn.textContent = `Sort Durasi ${sortAsc ? '↑' : '↓'}`;
+        const sorted = cards().sort((a,b)=>{
+          const da = +a.dataset.duration || 0, db = +b.dataset.duration || 0;
+          return sortAsc ? da - db : db - da;
+        });
+        sorted.forEach(el => list.appendChild(el));
+        return;
+      }
+
+      // Advanced filter (placeholder)
+      if(btn.id === 'moreBtn'){ alert('Filter lanjutan (coming soon)'); return; }
+
+      // Primary filter (single-select)
+      bar.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+      btn.classList.add('active');
+
+      const val = btn.dataset.filter || 'all';
+      cards().forEach(c => {
+        c.classList.remove('hidden');
+        if(val === 'all') return;
+
+        if(val === 'fav' && c.dataset.fav !== '1') { c.classList.add('hidden'); return; }
+        if(val.startsWith('area:')){
+          const target = val.split(':')[1].toLowerCase();
+          if((c.dataset.area||'').toLowerCase() !== target) c.classList.add('hidden');
+          return;
+        }
+        if(val.startsWith('type:')){
+          const target = val.split(':')[1].toLowerCase();
+          if((c.dataset.type||'').toLowerCase() !== target) c.classList.add('hidden');
+          return;
+        }
+      });
+    });
+  </script>
+</body>
+</html>
