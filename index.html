@@ -102,6 +102,11 @@
     <!-- Step indicators -->
     <div class="steps" id="stepDots" aria-label="Progress langkah"></div>
 
+    <button type="button" onclick="location.href='treatmentmockup.html'" class="btn-link">
+  Open Treatment Planner
+</button>
+
+
     <div class="card grid" id="formCard">
       <!-- BEGINNING addition -->
       <div>
@@ -554,13 +559,19 @@
     }
 
     function openPayment(){
-      const data = buildPayload('UNPAID');
-      if(qr){ qrcodeBox.innerHTML=''; }
-      qr = new QRCode(qrcodeBox, { text: JSON.stringify(data), width: 220, height: 220 });
-      qrPatient.textContent = data.patient;
-      qrAmount.textContent = (data.amount||0).toLocaleString('id-ID');
-      qrTime.textContent = new Date(data.at).toLocaleString('id-ID', { hour12:false });
-      payModal.classList.add('show');
+    const params = new URLSearchParams({
+  patient: patientEl.value.trim(),
+  nurse: nurseEl.value.trim(),
+  therapy: therapyEl.value,
+  location: locationHidden.value,
+  duration: durationEl.value,
+  amp: amplitudeRange.value,
+  amount: computePrice(),     // from index.html
+  at: new Date().toISOString()
+}).toString();
+
+window.open(`payment-mock.html?${params}`, "_blank");
+
     }
 
     function finalize(status){

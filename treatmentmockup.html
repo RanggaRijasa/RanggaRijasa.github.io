@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Mockup: Treatment Planner • Card + Sticky Summary</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#f6f7f6;            /* soft off-white */
+      --surface:#ffffff;       /* card */
+      --border:#e6ebee;        /* subtle border */
+      --text:#0f1c1d;          /* primary text */
+      --muted:#6b7c7d;         /* secondary text */
+      --accent:#17464a;        /* brand teal-dark */
+      --accent-2:#1c7a7a;      /* teal */
+      --danger:#b42318;        /* remove */
+      --shadow:0 6px 20px rgba(17,24,39,.08);
+      --radius:16px;
+      --pad:16px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text); background:var(--bg);
+      line-height:1.4; -webkit-font-smoothing:antialiased;
+    }
+
+    /* App Bar */
+    .appbar{position:sticky;top:0;z-index:30;background:var(--surface);
+      display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border);
+    }
+    .back{appearance:none;border:0;background:#eaf2f3;color:var(--accent);width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-size:18px;cursor:pointer}
+    .title{font-weight:700;font-size:18px}
+
+    /* Segmented */
+    .seg{display:flex;gap:8px;padding:12px 16px;background:transparent;position:sticky;top:58px;z-index:25}
+    .seg button{flex:1;appearance:none;border:1px solid var(--border);background:var(--surface);
+      padding:10px 12px;border-radius:999px;font-weight:600;color:var(--muted);cursor:pointer}
+    .seg button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+    /* Content */
+    .container{padding:8px 16px 180px;max-width:520px;margin:0 auto}
+    .section-title{font-size:13px;color:var(--muted);margin:8px 2px}
+
+    /* Card */
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);
+      padding:12px;margin:10px 0; transition:box-shadow .2s, transform .06s;}
+    .card:active{transform:scale(.995)}
+    .row{display:flex;align-items:center;gap:12px}
+    .grow{flex:1}
+    .icon{width:40px;height:40px;border-radius:12px;background:#eaf2f3;display:grid;place-items:center}
+    .icon svg{width:22px;height:22px;fill:var(--accent)}
+    .name{font-weight:600}
+    .meta{font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center;margin-top:2px}
+    .chip{display:inline-flex;align-items:center;border:1px solid var(--border);border-radius:999px;padding:3px 8px;font-size:12px;background:#fbfbfb}
+    .badge{display:inline-flex;align-items:center;border-radius:6px;padding:3px 6px;font-size:12px;background:#f1fbfb;color:#136666;border:1px solid #d9efef}
+
+    /* Stepper & subtotal */
+    .controls{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
+    .stepper{display:inline-grid;grid-template-columns:36px 44px 36px;align-items:center;border-radius:999px;border:1px solid var(--border);overflow:hidden}
+    .stepper button{appearance:none;border:0;background:#f3f6f7;height:36px;cursor:pointer;font-weight:700;font-size:18px}
+    .stepper .count{display:grid;place-items:center;height:36px;font-weight:700}
+    .subtotal{font-size:12px;color:var(--muted)}
+    .options{display:flex;gap:8px}
+    .ghost{appearance:none;border:1px dashed var(--border);background:transparent;color:var(--muted);padding:6px 10px;border-radius:8px;cursor:pointer}
+
+    /* Sticky summary + CTA */
+    .sticky-wrap{position:fixed;left:0;right:0;bottom:0;z-index:40;background:transparent}
+    .summary{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;background:var(--surface);
+      border-top:1px solid var(--border)}
+    .summary .left{display:flex;align-items:center;gap:10px;color:var(--accent)}
+    .summary .left .clock{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:#eaf2f3}
+    .summary .meta{color:var(--muted)}
+    .cta{width:100%;appearance:none;border:0;display:block;background:var(--accent);color:#fff;
+      font-weight:800;font-size:16px;letter-spacing:.3px;padding:16px 18px}
+    .cta:active{filter:brightness(.96)}
+
+    /* FAB */
+    .fab{position:fixed;right:16px;bottom:128px;z-index:35;width:56px;height:56px;border-radius:16px;border:0;color:#fff;cursor:pointer;
+      background:linear-gradient(180deg,var(--accent-2),var(--accent));box-shadow:0 12px 30px rgba(0,0,0,.18);font-size:28px;font-weight:700}
+
+    /* Bottom Sheet (simple) */
+    .sheet{position:fixed;inset:0;display:none;z-index:45}
+    .sheet.open{display:block}
+    .sheet .backdrop{position:absolute;inset:0;background:rgba(0,0,0,.28)}
+    .sheet .panel{position:absolute;left:0;right:0;bottom:0;background:var(--surface);border-radius:20px 20px 0 0;box-shadow:var(--shadow);padding:16px}
+    .sheet h3{margin:4px 0 12px 0}
+    .chip-list{display:flex;flex-wrap:wrap;gap:8px}
+    .chip-btn{appearance:none;border:1px solid var(--border);background:#fbfbfb;border-radius:999px;padding:8px 12px;cursor:pointer}
+
+    /* Small helpers */
+    .hidden{display:none}
+  </style>
+</head>
+<body>
+  <header class="appbar">
+    <button class="back" aria-label="Kembali" onclick="alert('Mock back')">←</button>
+    <div class="title">Data Pasien</div>
+  </header>
+
+  <div class="seg" role="tablist">
+    <button class="active" role="tab" aria-selected="true">Treatment</button>
+    <button role="tab" aria-selected="false" onclick="alert('Rekap Medis (mock)')">Rekap Medis</button>
+  </div>
+
+  <main class="container" id="list">
+    <div class="section-title">Daftar treatment</div>
+    <!-- Cards will be injected here by JS -->
+  </main>
+
+  <button class="fab" id="fab" title="Tambah treatment">＋</button>
+
+  <!-- Bottom sheet: add treatment (mock) -->
+  <div class="sheet" id="sheet">
+    <div class="backdrop" onclick="toggleSheet(false)"></div>
+    <div class="panel">
+      <h3>Pilih Treatment Cepat</h3>
+      <div class="chip-list" id="chipList"></div>
+    </div>
+  </div>
+
+  <!-- Sticky summary & CTA -->
+  <div class="sticky-wrap">
+    <div class="summary">
+      <div class="left">
+        <div class="clock" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        </div>
+        <div>
+          <div id="totalText" style="font-weight:700;">0 mnt</div>
+          <div class="meta" id="estText">~0j 0m • 0 treatment</div>
+        </div>
+      </div>
+      <div class="right">
+        <span class="badge" id="targetBadge">Target ≤ 180 mnt</span>
+      </div>
+    </div>
+    <button class="cta" id="cta">LANJUT (0 mnt)</button>
+  </div>
+
+  <script>
+    // --- Data model ---
+    const CATALOG = [
+      { id: 't1', name: 'Therapeutic Massage', duration: 30, icon: 'hands' },
+      { id: 't2', name: 'Hot Stone Therapy', duration: 30, icon: 'flame' },
+      { id: 't3', name: 'Aromatherapy', duration: 30, icon: 'leaf' },
+      { id: 't4', name: 'Body Scrub', duration: 30, icon: 'sparkle' },
+      { id: 't5', name: 'Facial Treatment', duration: 30, icon: 'sparkle' },
+    ];
+
+    let items = [
+      { id: 't1', qty: 1 },
+      { id: 't2', qty: 2 },
+      { id: 't3', qty: 5 },
+      { id: 't4', qty: 3 },
+    ];
+
+    const listEl = document.getElementById('list');
+    const totalText = document.getElementById('totalText');
+    const estText = document.getElementById('estText');
+    const cta = document.getElementById('cta');
+    const targetBadge = document.getElementById('targetBadge');
+
+    // --- Render helpers ---
+    function iconSVG(kind){
+      switch(kind){
+        case 'hands': return '<svg viewBox="0 0 24 24"><path d="M9 11l-4-4a2 2 0 013-3l3 3m4 8l4 4a2 2 0 01-3 3l-3-3" stroke="currentColor" stroke-width="2" fill="none"/></svg>';
+        case 'flame': return '<svg viewBox="0 0 24 24"><path d="M8 14a4 4 0 108 0c0-4-4-6-4-9 0 2-4 5-4 9z" stroke="currentColor" stroke-width="2" fill="none"/></svg>';
+        default: return '<svg viewBox="0 0 24 24"><path d="M12 2l3 6 6 1-4 4 1 6-6-3-6 3 1-6-4-4 6-1z" stroke="currentColor" stroke-width="2" fill="none"/></svg>'
+      }
+    }
+
+    function tmplCard(cat, qty){
+      const el = document.createElement('div');
+      el.className = 'card';
+      el.dataset.id = cat.id;
+      el.innerHTML = `
+        <div class="row">
+          <div class="icon">${iconSVG(cat.icon)}</div>
+          <div class="grow">
+            <div class="name">${cat.name}</div>
+            <div class="meta">
+              <span class="chip">⏱ ${cat.duration} min</span>
+            </div>
+          </div>
+          <div class="options">
+            <button class="ghost" title="Catatan">Catatan</button>
+            <button class="ghost" title="Hapus" data-remove>Hapus</button>
+          </div>
+        </div>
+        <div class="controls">
+          <div class="stepper">
+            <button data-minus aria-label="Kurangi">−</button>
+            <div class="count" data-count>${qty}</div>
+            <button data-plus aria-label="Tambah">＋</button>
+          </div>
+          <div class="subtotal" data-sub> Total <b>${cat.duration * qty} min</b></div>
+        </div>`;
+
+      el.querySelector('[data-minus]').addEventListener('click', () => changeQty(cat.id, -1));
+      el.querySelector('[data-plus]').addEventListener('click', () => changeQty(cat.id, +1));
+      el.querySelector('[data-remove]').addEventListener('click', () => removeItem(cat.id));
+      return el;
+    }
+
+    function render(){
+      const mount = document.createDocumentFragment();
+      // Clear old cards (except title)
+      const nodes = Array.from(listEl.querySelectorAll('.card'));
+      nodes.forEach(n => n.remove());
+
+      items.forEach(it => {
+        const cat = CATALOG.find(c => c.id === it.id);
+        if(!cat) return;
+        mount.appendChild(tmplCard(cat, it.qty));
+      });
+      listEl.appendChild(mount);
+      recompute();
+    }
+
+    function changeQty(id, delta){
+      const it = items.find(x => x.id === id);
+      if(!it) return;
+      it.qty = Math.max(0, (it.qty||0) + delta);
+      if(it.qty === 0){
+        // Optional: remove item when qty is zero
+        items = items.filter(x => x.id !== id);
+      }
+      render();
+    }
+
+    function removeItem(id){
+      items = items.filter(x => x.id !== id);
+      render();
+    }
+
+    function recompute(){
+      const totalMin = items.reduce((sum,it)=>{
+        const cat = CATALOG.find(c=>c.id===it.id); return sum + (cat?cat.duration*it.qty:0);
+      },0);
+      const n = items.length;
+      const h = Math.floor(totalMin/60); const m = totalMin%60;
+      totalText.textContent = `${totalMin} mnt`;
+      estText.textContent = `~${h}j ${m}m • ${n} treatment`;
+      cta.textContent = `LANJUT (${totalMin} mnt)`;
+      // Target indicator (180 min) → amber style via inline color
+      if(totalMin > 180){
+        targetBadge.style.background = '#fff7ed';
+        targetBadge.style.color = '#9a3412';
+        targetBadge.style.borderColor = '#fed7aa';
+      } else {
+        targetBadge.style.background = '#f1fbfb';
+        targetBadge.style.color = '#136666';
+        targetBadge.style.borderColor = '#d9efef';
+      }
+    }
+
+    // --- Bottom Sheet (Add Treatment) ---
+    const fab = document.getElementById('fab');
+    const sheet = document.getElementById('sheet');
+    const chipList = document.getElementById('chipList');
+
+    function toggleSheet(open){ sheet.classList.toggle('open', open); }
+    fab.addEventListener('click', ()=>{ buildChips(); toggleSheet(true); });
+
+    function buildChips(){
+      chipList.innerHTML = '';
+      CATALOG.forEach(c => {
+        const btn = document.createElement('button');
+        btn.className = 'chip-btn';
+        btn.textContent = `${c.name} · ${c.duration}m`;
+        btn.onclick = () => { addItem(c.id); toggleSheet(false); };
+        chipList.appendChild(btn);
+      });
+    }
+
+    function addItem(id){
+      const found = items.find(x => x.id === id);
+      if(found) found.qty += 1; else items.push({id, qty:1});
+      render();
+    }
+
+    // CTA mock
+    cta.addEventListener('click', () => alert('Lanjut ke penjadwalan (mock)'));
+
+    // Init
+    render();
+  </script>
+</body>
+</html>

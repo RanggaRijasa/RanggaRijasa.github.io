@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>Stimel-03 • QRIS Mock Payment</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0b1220; --card:#111827; --muted:#94a3b8; --text:#e5e7eb;
+      --primary:#22c55e; --primary-pressed:#16a34a; --accent:#38bdf8; --danger:#ef4444;
+      --ring:0 0 0 2px rgba(56,189,248,.35); --shadow:0 10px 30px rgba(0,0,0,.35); --radius:16px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:linear-gradient(180deg,var(--bg),#0f172a);color:var(--text);font:16px/1.45 Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+    header{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,rgba(11,18,32,.9),rgba(11,18,32,.5));backdrop-filter:blur(8px);border-bottom:1px solid rgba(148,163,184,.15)}
+    .head{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:12px 16px}
+    .brand{display:flex;align-items:center;gap:10px}
+    .logo{width:36px;height:36px;border-radius:12px;background:conic-gradient(from 180deg at 50% 50%,var(--accent),var(--primary));box-shadow:0 6px 16px rgba(34,197,94,.35)}
+    h1{font-size:17px;margin:0;letter-spacing:.2px}
+    .container{max-width:780px;margin:0 auto;padding:16px}
+    .card{background:linear-gradient(180deg,#0f172a,#0b1220);border:1px solid rgba(148,163,184,.12);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
+    .muted{color:var(--muted)}
+    .pill{display:inline-flex;align-items:center;gap:6px;background:#0b1220;border:1px solid rgba(148,163,184,.25);border-radius:999px;padding:6px 10px;font-size:12px}
+    .row{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    .btn{appearance:none;border:0;border-radius:12px;padding:12px 14px;background:#1f2937;color:var(--text);font-weight:600;cursor:pointer;box-shadow:var(--shadow);transition:.2s}
+    .btn:hover{filter:brightness(1.05)}
+    .btn.primary{background:var(--primary);color:#04130a}
+    .btn.primary:active{transform:translateY(1px);background:var(--primary-pressed)}
+    .btn.ghost{background:transparent;border:1px solid rgba(148,163,184,.35)}
+    .btn.link{background:transparent;border:0;padding:0;text-decoration:underline}
+    .qr{display:grid;place-items:center;padding:14px;background:#0b1220;border:1px dashed rgba(148,163,184,.35);border-radius:14px}
+    .kbd{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-weight:600}
+    .flex{display:flex;align-items:center;gap:10px}
+    .flex-col{display:flex;flex-direction:column;gap:10px}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .divider{height:1px;background:linear-gradient(90deg,transparent,rgba(148,163,184,.25),transparent);margin:12px 0}
+    .hint{font-size:12px;color:var(--muted)}
+
+    /* Success modal */
+    .modal{position:fixed;inset:0;display:none;place-items:center;padding:16px;background:rgba(2,6,23,.65);backdrop-filter:blur(6px);z-index:60}
+    .modal.show{display:grid}
+    .sheet{width:min(560px,100%);background:linear-gradient(180deg,#0f172a,#0b1220);border:1px solid rgba(148,163,184,.18);border-radius:20px;box-shadow:var(--shadow);padding:16px}
+    .sheet h3{margin:6px 0 2px}
+
+    /* Mobile fullscreen QR */
+    @media (max-width: 768px){
+      .grid2{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="head">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>Stimel‑03 • QRIS Mock Payment</h1>
+          <div class="muted" style="font-size:12px">Demo pembayaran & aksi pasca-lunas</div>
+        </div>
+      </div>
+      <div class="flex">
+        <button class="btn ghost" onclick="history.back()">Kembali</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="card">
+      <div class="grid2">
+        <div class="flex-col">
+          <div class="flex" style="flex-wrap:wrap">
+            <span class="pill">Pasien: <span id="pPatient" class="kbd" style="margin-left:6px"></span></span>
+            <span class="pill">Perawat: <span id="pNurse" class="kbd" style="margin-left:6px"></span></span>
+          </div>
+          <div class="flex" style="flex-wrap:wrap">
+            <span class="pill">Program: <span id="pTherapy" class="kbd" style="margin-left:6px"></span></span>
+            <span class="pill">Lokasi: <span id="pLocation" class="kbd" style="margin-left:6px"></span></span>
+          </div>
+          <div class="flex" style="flex-wrap:wrap">
+            <span class="pill">Durasi: <span id="pDuration" class="kbd" style="margin-left:6px"></span> menit</span>
+            <span class="pill">Amp: <span id="pAmp" class="kbd" style="margin-left:6px"></span></span>
+          </div>
+          <div class="divider"></div>
+          <div class="flex" style="flex-wrap:wrap">
+            <span class="pill">Nominal: Rp <span id="pAmount" class="kbd" style="margin-left:6px"></span></span>
+            <span class="pill">Waktu: <span id="pTime" class="kbd" style="margin-left:6px"></span></span>
+          </div>
+          <div class="hint">Ini tampilan mock; QR berisi payload JSON demo.</div>
+        </div>
+        <div>
+          <div class="qr"><div id="qrcode"></div></div>
+          <div class="flex" style="justify-content:space-between;margin-top:12px">
+            <button id="btnPaid" class="btn primary" style="flex:1">Simulasikan Pembayaran Berhasil</button>
+            <button id="btnCancel" class="btn ghost" style="flex:1">Batal</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <strong>Cara pakai (opsional):</strong>
+      <ol style="margin-top:6px; padding-left:18px">
+        <li>Buka dari <span class="kbd">index.html</span> dengan URL params, contoh: <span class="kbd">payment-mock.html?patient=Rina&nurse=Dina&therapy=Biofeedback%201&location=Quadriceps&duration=60&amp;amp=30&amount=150000</span></li>
+        <li>Tekan <em>Simulasikan Pembayaran Berhasil</em> untuk memunculkan pop-up aksi.</li>
+      </ol>
+      <div class="hint">Jika dibuka dari aplikasi induk, halaman ini akan mengirim <span class="kbd">postMessage</span> bertipe <span class="kbd">QR_PAYMENT_SUCCESS</span> ke <span class="kbd">window.opener</span>.</div>
+    </div>
+  </main>
+
+  <!-- Success Actions Modal -->
+  <div id="successModal" class="modal" role="dialog" aria-modal="true" aria-label="Pembayaran Berhasil">
+    <div class="sheet">
+      <div class="flex" style="justify-content:space-between">
+        <h3>✅ Pembayaran Berhasil</h3>
+        <button class="btn ghost" id="closeSuccess">Tutup</button>
+      </div>
+      <div class="muted" style="margin:6px 0 10px">Transaksi tersimpan. Pilih aksi berikut:</div>
+      <div class="grid2">
+        <button id="btnViewReport" class="btn primary">Lihat Laporan di Aplikasi</button>
+        <button id="btnShareReport" class="btn">Bagikan Laporan</button>
+      </div>
+      <div id="shareFallback" class="hint" style="display:none;margin-top:10px"></div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script>
+    const $ = (s)=>document.querySelector(s);
+
+    // Parse payload from URL or use demo defaults
+    function getPayload(){
+      const q = new URLSearchParams(location.search);
+      const pad = (n)=> (n<10?'0':'')+n;
+      const now = new Date();
+      const at = q.get('at') || now.toISOString();
+      const payload = {
+        schema:'QRIS-DEMO',
+        id: q.get('id') || ('TX-'+Date.now()),
+        patient: q.get('patient') || 'Pasien Demo',
+        nurse: q.get('nurse') || 'Perawat Demo',
+        therapy: q.get('therapy') || 'Biofeedback 1',
+        location: q.get('location') || 'Quadriceps',
+        duration: Number(q.get('duration')||60),
+        amplitude: Number(q.get('amp')||30),
+        amount: Number(q.get('amount')||150000),
+        at: at,
+        status: 'UNPAID'
+      };
+      return payload;
+    }
+
+    const data = getPayload();
+
+    // Render summary and QR
+    function render(){
+      $('#pPatient').textContent = data.patient;
+      $('#pNurse').textContent = data.nurse;
+      $('#pTherapy').textContent = data.therapy;
+      $('#pLocation').textContent = data.location;
+      $('#pDuration').textContent = data.duration;
+      $('#pAmp').textContent = data.amplitude;
+      $('#pAmount').textContent = (data.amount||0).toLocaleString('id-ID');
+      $('#pTime').textContent = new Date(data.at).toLocaleString('id-ID',{hour12:false});
+
+      const size = Math.min(420, Math.floor(Math.min(window.innerWidth, window.innerHeight)*0.7));
+      new QRCode(document.getElementById('qrcode'), {
+        text: JSON.stringify(data), width: size, height: size
+      });
+    }
+
+    function showSuccess(){
+      data.status = 'paid';
+      // Notify opener (index.html) if present
+      try{ window.opener && window.opener.postMessage({type:'QR_PAYMENT_SUCCESS', payload:data}, '*'); }catch(e){}
+      $('#successModal').classList.add('show');
+    }
+
+    async function shareReport(){
+      const summary = `Stimel-03 Payment Receipt\n`+
+        `ID: ${data.id}\nTanggal: ${new Date(data.at).toLocaleString('id-ID',{hour12:false})}\n`+
+        `Pasien: ${data.patient}\nPerawat: ${data.nurse}\nProgram: ${data.therapy}\n`+
+        `Lokasi: ${data.location}\nDurasi: ${data.duration} menit\nAmp: ${data.amplitude}\n`+
+        `Nominal: Rp ${(data.amount||0).toLocaleString('id-ID')}\nStatus: Lunas`;
+
+      // Prepare CSV file
+      const csvRow = [
+        'Waktu','Pasien','Perawat','Lokasi','Jenis Terapi','Durasi','Amplitudo','Nominal','Status','ID'\
+      ].join(',') + '\n' + [
+        new Date(data.at).toLocaleString('id-ID',{hour12:false}), data.patient, data.nurse, data.location,
+        data.therapy, data.duration, data.amplitude, data.amount, data.status, data.id
+      ].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',');
+      const blob = new Blob([csvRow], {type:'text/csv'});
+
+      if(navigator.share){
+        try{
+          if(navigator.canShare && navigator.canShare({ files: [new File([blob], `stimel-${data.id}.csv`, {type:'text/csv'})] })){
+            await navigator.share({
+              title: 'Laporan Stimel-03',
+              text: summary,
+              files: [new File([blob], `stimel-${data.id}.csv`, {type:'text/csv'})]
+            });
+          } else {
+            await navigator.share({ title: 'Laporan Stimel-03', text: summary });
+          }
+          return;
+        } catch(err){ /* user canceled or unsupported */ }
+      }
+      // Fallback: show download link + copy
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `stimel-${data.id}.csv`;
+      a.textContent = 'Unduh CSV laporan';
+      const holder = document.getElementById('shareFallback');
+      holder.innerHTML = '';
+      holder.appendChild(a);
+      const copyBtn = document.createElement('button');
+      copyBtn.className = 'btn link';
+      copyBtn.textContent = 'Salin ringkasan';
+      copyBtn.onclick = async ()=>{
+        try{ await navigator.clipboard.writeText(summary); copyBtn.textContent='Tersalin!'; }catch(e){ copyBtn.textContent='Gagal menyalin'; }
+      };
+      holder.appendChild(document.createTextNode(' – '));
+      holder.appendChild(copyBtn);
+      holder.style.display = 'block';
+    }
+
+    function viewReport(){
+      // Tell parent to open report view for this patient; fallback to index.html anchor
+      try{ if(window.opener){ window.opener.postMessage({type:'OPEN_REPORT', patient:data.patient}, '*'); return; } }catch(e){}
+      location.href = `index.html#openReport=1&patient=${encodeURIComponent(data.patient)}`;
+    }
+
+    // Wire up events
+    document.getElementById('btnPaid').addEventListener('click', showSuccess);
+    document.getElementById('btnCancel').addEventListener('click', ()=>history.back());
+    document.getElementById('btnViewReport').addEventListener('click', viewReport);
+    document.getElementById('btnShareReport').addEventListener('click', shareReport);
+    document.getElementById('closeSuccess').addEventListener('click', ()=>document.getElementById('successModal').classList.remove('show'));
+
+    render();
+  </script>
+</body>
+</html>
