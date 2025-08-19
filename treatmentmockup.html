@@ -9,14 +9,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root{
-      --bg:#f6f7f6;            /* soft off-white */
-      --surface:#ffffff;       /* card */
-      --border:#e6ebee;        /* subtle border */
-      --text:#0f1c1d;          /* primary text */
-      --muted:#6b7c7d;         /* secondary text */
-      --accent:#17464a;        /* brand teal-dark */
-      --accent-2:#1c7a7a;      /* teal */
-      --danger:#b42318;        /* remove */
+      --bg:#f6f7f6;
+      --surface:#ffffff;
+      --border:#e6ebee;
+      --text:#0f1c1d;
+      --muted:#6b7c7d;
+      --accent:#17464a;
+      --accent-2:#1c7a7a;
+      --danger:#b42318;
       --shadow:0 6px 20px rgba(17,24,39,.08);
       --radius:16px;
       --pad:16px;
@@ -84,7 +84,7 @@
     .fab{position:fixed;right:16px;bottom:128px;z-index:35;width:56px;height:56px;border-radius:16px;border:0;color:#fff;cursor:pointer;
       background:linear-gradient(180deg,var(--accent-2),var(--accent));box-shadow:0 12px 30px rgba(0,0,0,.18);font-size:28px;font-weight:700}
 
-    /* Bottom Sheet (simple) */
+    /* Bottom Sheet (quick add) */
     .sheet{position:fixed;inset:0;display:none;z-index:45}
     .sheet.open{display:block}
     .sheet .backdrop{position:absolute;inset:0;background:rgba(0,0,0,.28)}
@@ -92,6 +92,36 @@
     .sheet h3{margin:4px 0 12px 0}
     .chip-list{display:flex;flex-wrap:wrap;gap:8px}
     .chip-btn{appearance:none;border:1px solid var(--border);background:#fbfbfb;border-radius:999px;padding:8px 12px;cursor:pointer}
+
+    /* NEW: Transaction Type Sheet */
+    .txsheet{position:fixed; inset:0; display:none; z-index:50}
+    .txsheet.open{display:block}
+    .txsheet .tx-backdrop{position:absolute; inset:0; background:rgba(0,0,0,.32); opacity:0; transition:opacity .2s}
+    .txsheet.open .tx-backdrop{opacity:1}
+    .txsheet .tx-panel{
+      position:absolute; left:0; right:0; bottom:0;
+      background:var(--surface); border-top-left-radius:16px; border-top-right-radius:16px;
+      box-shadow:0 -10px 30px rgba(0,0,0,.16);
+      transform:translateY(100%); transition:transform .24s ease;
+      padding-bottom:max(16px, env(safe-area-inset-bottom));
+    }
+    .txsheet.open .tx-panel{transform:translateY(0)}
+    .grabber{width:48px;height:5px;border-radius:999px;background:#dfe6ea;margin:8px auto}
+    .tx-head{display:flex;align-items:center;justify-content:space-between;padding:6px 16px}
+    .tx-close{appearance:none;border:1px solid var(--border);background:#f6f8f9;border-radius:10px;width:32px;height:32px;cursor:pointer}
+    .tx-body{padding:8px 16px 12px}
+    .tx-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .tx-card{
+      display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;
+      padding:16px 12px;border-radius:14px;background:#f8fafb;border:1px solid var(--border);cursor:pointer;
+      transition:transform .05s, box-shadow .15s;
+    }
+    .tx-card:active{transform:scale(.99)}
+    .tx-card:hover{box-shadow:0 6px 18px rgba(17,24,39,.06)}
+    .tx-icon{font-size:22px}
+    .tx-title{font-weight:800}
+    .tx-sub{font-size:12px;color:var(--muted)}
+    .help{color:var(--muted);font-size:12px;margin:12px 4px 0}
 
     /* Small helpers */
     .hidden{display:none}
@@ -115,12 +145,39 @@
 
   <button class="fab" id="fab" title="Tambah treatment">＋</button>
 
-  <!-- Bottom sheet: add treatment (mock) -->
+  <!-- Bottom sheet: add treatment (existing) -->
   <div class="sheet" id="sheet">
     <div class="backdrop" onclick="toggleSheet(false)"></div>
     <div class="panel">
       <h3>Pilih Treatment Cepat</h3>
       <div class="chip-list" id="chipList"></div>
+    </div>
+  </div>
+
+  <!-- NEW: Bottom sheet – pilih jenis transaksi -->
+  <div class="txsheet" id="txTypeSheet" aria-hidden="true">
+    <div class="tx-backdrop" tabindex="-1"></div>
+    <div class="tx-panel" role="dialog" aria-modal="true" aria-labelledby="txTitle">
+      <div class="grabber" aria-hidden="true"></div>
+      <header class="tx-head">
+        <h3 id="txTitle" style="margin:0;font-size:16px">Pilih jenis transaksi</h3>
+        <button class="tx-close" aria-label="Tutup">✕</button>
+      </header>
+      <div class="tx-body">
+        <div class="tx-grid">
+          <button class="tx-card" data-type="paket">
+            <span class="tx-icon">📦</span>
+            <span class="tx-title">Paket</span>
+            <span class="tx-sub">Gunakan sisa sesi / paket</span>
+          </button>
+          <button class="tx-card" data-type="non_paket">
+            <span class="tx-icon">🧾</span>
+            <span class="tx-title">Non-paket</span>
+            <span class="tx-sub">Bayar per treatment</span>
+          </button>
+        </div>
+        <p class="help">Jenis transaksi bisa diubah di langkah berikutnya.</p>
+      </div>
     </div>
   </div>
 
@@ -136,7 +193,8 @@
           <div class="meta" id="estText">~0j 0m • 0 treatment</div>
         </div>
       </div>
-      <div class="right">
+      <div class="right" style="display:flex;gap:8px;align-items:center">
+        <span class="badge" id="txTypePill">Jenis: —</span>
         <span class="badge" id="targetBadge">Target ≤ 180 mnt</span>
       </div>
     </div>
@@ -165,6 +223,8 @@
     const estText = document.getElementById('estText');
     const cta = document.getElementById('cta');
     const targetBadge = document.getElementById('targetBadge');
+    const txTypePill = document.getElementById('txTypePill');
+    let txType = null; // "paket" | "non_paket"
 
     // --- Render helpers ---
     function iconSVG(kind){
@@ -228,7 +288,6 @@
       if(!it) return;
       it.qty = Math.max(0, (it.qty||0) + delta);
       if(it.qty === 0){
-        // Optional: remove item when qty is zero
         items = items.filter(x => x.id !== id);
       }
       render();
@@ -248,7 +307,6 @@
       totalText.textContent = `${totalMin} mnt`;
       estText.textContent = `~${h}j ${m}m • ${n} treatment`;
       cta.textContent = `LANJUT (${totalMin} mnt)`;
-      // Target indicator (180 min) → amber style via inline color
       if(totalMin > 180){
         targetBadge.style.background = '#fff7ed';
         targetBadge.style.color = '#9a3412';
@@ -258,6 +316,7 @@
         targetBadge.style.color = '#136666';
         targetBadge.style.borderColor = '#d9efef';
       }
+      txTypePill.textContent = `Jenis: ${txType ? (txType==='paket'?'Paket':'Non-paket') : '—'}`;
     }
 
     // --- Bottom Sheet (Add Treatment) ---
@@ -266,8 +325,6 @@
     const chipList = document.getElementById('chipList');
 
     function toggleSheet(open){ sheet.classList.toggle('open', open); }
-    fab.addEventListener('click', ()=>{ buildChips(); toggleSheet(true); });
-
     function buildChips(){
       chipList.innerHTML = '';
       CATALOG.forEach(c => {
@@ -278,12 +335,54 @@
         chipList.appendChild(btn);
       });
     }
-
     function addItem(id){
       const found = items.find(x => x.id === id);
       if(found) found.qty += 1; else items.push({id, qty:1});
       render();
     }
+
+    // --- NEW: Transaction Type Sheet ---
+    const txSheet = document.getElementById('txTypeSheet');
+    const txPanel = txSheet.querySelector('.tx-panel');
+    const txBackdrop = txSheet.querySelector('.tx-backdrop');
+    const txClose = txSheet.querySelector('.tx-close');
+    const txCards = txSheet.querySelectorAll('.tx-card');
+
+    function openTxSheet(){ txSheet.classList.add('open'); txSheet.setAttribute('aria-hidden','false'); setTimeout(()=>txClose.focus(),10); }
+    function closeTxSheet(){ txSheet.classList.remove('open'); txSheet.setAttribute('aria-hidden','true'); txPanel.style.transform=''; }
+
+    // Drag-to-close
+    let startY=0, currentY=0, dragging=false;
+    const dragStart = e => { dragging=true; startY=(e.touches?e.touches[0].clientY:e.clientY); txPanel.style.transition='none'; };
+    const dragMove  = e => { if(!dragging) return; currentY=(e.touches?e.touches[0].clientY:e.clientY); const dy=Math.max(0,currentY-startY); txPanel.style.transform=`translateY(${dy}px)`; };
+    const dragEnd   = () => { if(!dragging) return; dragging=false; const dy=Math.max(0,currentY-startY); txPanel.style.transition=''; if(dy>120) closeTxSheet(); else txPanel.style.transform='translateY(0)'; };
+
+    txPanel.addEventListener('mousedown',dragStart);
+    txPanel.addEventListener('mousemove',dragMove);
+    txPanel.addEventListener('mouseup',dragEnd);
+    txPanel.addEventListener('mouseleave',dragEnd);
+    txPanel.addEventListener('touchstart',dragStart,{passive:true});
+    txPanel.addEventListener('touchmove',dragMove,{passive:true});
+    txPanel.addEventListener('touchend',dragEnd);
+
+    txBackdrop.addEventListener('click', closeTxSheet);
+    txClose.addEventListener('click', closeTxSheet);
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape' && txSheet.classList.contains('open')) closeTxSheet(); });
+
+    // Selection -> update pill + open quick add
+    function onTransactionTypeSelected(type){
+      txType = type; // 'paket' | 'non_paket'
+      render();
+      closeTxSheet();
+      // Next: open existing quick-add sheet (you can branch by type)
+      buildChips();
+      toggleSheet(true);
+    }
+
+    txCards.forEach(btn => btn.addEventListener('click', ()=> onTransactionTypeSelected(btn.dataset.type)));
+
+    // FAB now opens tx type first
+    fab.addEventListener('click', openTxSheet);
 
     // CTA mock
     cta.addEventListener('click', () => alert('Lanjut ke penjadwalan (mock)'));

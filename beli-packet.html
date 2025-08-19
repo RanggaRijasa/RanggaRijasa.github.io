@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>Data Paket • Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f7f6f2; --surface:#fff; --border:#e6ebee; --text:#11292a; --muted:#6b7c7d;
+  --accent:#1a686a; --accent2:#17464a; --shadow:0 8px 24px rgba(17,24,39,.08); --r:16px;
+}
+*{box-sizing:border-box} body{margin:0;font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--text);background:var(--bg)}
+.appbar{position:sticky;top:0;z-index:20;background:var(--surface);border-bottom:1px solid var(--border);padding:12px 16px;font-weight:700}
+.wrap{max-width:720px;margin:8px auto 120px;padding:0 16px}
+h1{font-size:18px;margin:10px 2px}
+.controls{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;margin:8px 0}
+.search{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:12px}
+.chip{appearance:none;border:1px solid var(--border);background:#fff;border-radius:999px;padding:8px 12px;cursor:pointer;font-weight:600;display:inline-flex;gap:6px;align-items:center}
+.select{padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:#fff}
+
+.list{display:grid;gap:12px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);padding:12px}
+.cardHead{display:flex;gap:10px;align-items:flex-start}
+.radio{margin-top:3px}
+.pname{font-weight:700}
+.ptags{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
+.badge{font-size:12px;border:1px solid var(--border);border-radius:999px;padding:3px 8px;background:#fbfbfb;color:var(--muted)}
+.items{list-style:none;margin:8px 0 10px;padding:0;display:grid;gap:6px}
+.items li{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center}
+.itemname{font-weight:600}
+.chipmini{font-size:12px;color:var(--muted);background:#fbfbfb;border:1px solid var(--border);padding:3px 8px;border-radius:999px}
+.qty{min-width:36px;text-align:right}
+.footer{display:flex;justify-content:space-between;align-items:center;border-top:1px dashed var(--border);padding-top:8px;color:var(--muted)}
+.total b{color:var(--text)}
+.price{font-weight:800}
+.card.selected{outline:2px solid var(--accent);box-shadow:0 10px 24px rgba(26,104,106,.12)}
+.card .more{margin-left:auto;appearance:none;border:1px dashed var(--border);background:#fff;border-radius:8px;padding:4px 8px;font-size:12px;color:var(--muted);cursor:pointer}
+
+.sticky{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--border);z-index:30}
+.sticky .inner{max-width:720px;margin:0 auto;padding:10px 16px;display:grid;gap:10px}
+.sumrow{display:flex;justify-content:space-between;align-items:center}
+.pill{background:#eef7f7;border:1px solid #d9efef;color:#136666;border-radius:999px;padding:4px 8px;font-weight:600}
+.cta{appearance:none;border:0;background:var(--accent2);color:#fff;font-weight:800;padding:14px;border-radius:12px}
+.cta[disabled]{opacity:.5;cursor:not-allowed}
+
+/* Side sheet filter */
+.sheet{position:fixed;inset:0;display:none;z-index:40}
+.sheet.open{display:block}
+.backdrop{position:absolute;inset:0;background:rgba(0,0,0,.28)}
+.panel{position:absolute;top:0;right:0;bottom:0;width:86vw;max-width:380px;background:#fff;border-left:1px solid var(--border);box-shadow:0 8px 24px rgba(0,0,0,.18);display:flex;flex-direction:column;border-radius:12px 0 0 12px}
+.fhead{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid var(--border)}
+.fbody{padding:12px 14px;overflow:auto}
+.ftitle{font-weight:700;margin:8px 0 6px}
+.frow{display:flex;align-items:center;gap:8px}
+.cb{display:flex;gap:8px;align-items:center;margin:6px 0}
+.fchips{display:flex;flex-wrap:wrap;gap:8px}
+.input{padding:10px 12px;border:1px solid var(--border);border-radius:10px}
+.ffoot{padding:10px 14px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.btn{appearance:none;border:1px solid var(--border);background:#fff;border-radius:12px;padding:10px 14px;font-weight:700;cursor:pointer}
+.btn.primary{background:var(--accent2);color:#fff;border-color:var(--accent2)}
+.muted{color:var(--muted);font-size:12px}
+</style>
+</head>
+<body>
+  <div class="appbar">Data Paket</div>
+  <div class="wrap">
+    <h1>Pilih paket yang Anda inginkan</h1>
+    <div class="controls">
+      <input id="search" class="search" placeholder="Cari paket / item…"/>
+      <button id="openFilter" class="chip">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path d="M3 5h18M6 12h12M10 19h4" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+        Filter
+      </button>
+      <select id="sortBy" class="select">
+        <option value="recent">Terbaru</option>
+        <option value="price_asc">Harga termurah</option>
+        <option value="price_desc">Harga termahal</option>
+        <option value="dur_desc">Durasi terpanjang</option>
+        <option value="dur_asc">Durasi terpendek</option>
+      </select>
+    </div>
+
+    <div id="list" class="list"></div>
+  </div>
+
+  <!-- Sticky summary -->
+  <div class="sticky">
+    <div class="inner">
+      <div class="sumrow">
+        <div>
+          <div class="muted">Paket terpilih</div>
+          <div style="font-weight:800" id="sumText">Belum ada</div>
+        </div>
+        <div id="pill" class="pill hidden"></div>
+      </div>
+      <button id="cta" class="cta" disabled>LANJUT</button>
+    </div>
+  </div>
+
+  <!-- Filter sheet -->
+  <div class="sheet" id="sheet">
+    <div class="backdrop" onclick="toggleSheet(false)"></div>
+    <aside class="panel">
+      <div class="fhead">
+        <strong>Filter Paket</strong>
+        <button class="btn" onclick="resetFilter()">Reset</button>
+      </div>
+      <div class="fbody">
+        <div class="ftitle">Tipe</div>
+        <label class="cb"><input type="checkbox" name="type" value="nmes"> NMES</label>
+        <label class="cb"><input type="checkbox" name="type" value="bfes"> BFES</label>
+        <label class="cb"><input type="checkbox" name="type" value="mixed"> Campuran</label>
+
+        <div class="ftitle">Area</div>
+        <div class="fchips">
+          <label class="chip"><input type="checkbox" name="area" value="UE"> UE</label>
+          <label class="chip"><input type="checkbox" name="area" value="LE"> LE</label>
+          <label class="chip"><input type="checkbox" name="area" value="Mixed"> Mixed</label>
+        </div>
+
+        <div class="ftitle">Durasi total (menit)</div>
+        <div class="frow">
+          <input id="durMin" class="input" type="number" min="0" step="30" placeholder="min" style="width:100px">
+          <span class="muted">—</span>
+          <input id="durMax" class="input" type="number" min="0" step="30" placeholder="max" style="width:100px">
+        </div>
+
+        <div class="ftitle">Harga (Rp)</div>
+        <div class="frow">
+          <input id="priceMin" class="input" type="number" min="0" step="50000" placeholder="min" style="width:120px">
+          <span class="muted">—</span>
+          <input id="priceMax" class="input" type="number" min="0" step="50000" placeholder="max" style="width:120px">
+        </div>
+
+        <div class="ftitle">Kata kunci</div>
+        <input id="kw" class="input" placeholder="Nama paket / item…">
+      </div>
+      <div class="ffoot">
+        <span id="resCount" class="muted">—</span>
+        <button class="btn primary" onclick="applyFilter()">Terapkan</button>
+      </div>
+    </aside>
+  </div>
+
+<script>
+/* ---------- Data ---------- */
+const PACKAGES = [
+  {
+    id:'p1', name:'Paket NMES Standard', type:'nmes', area:'UE', price:1500000, updated:'2025-05-15',
+    items:[ {name:'Motor UE2', dur:30, qty:5}, {name:'Motor UE3', dur:30, qty:5} ]
+  },
+  {
+    id:'p2', name:'Paket BFES Sensitive', type:'bfes', area:'UE', price:1700000, updated:'2025-05-12',
+    items:[ {name:'Biofeedback 1', dur:30, qty:5}, {name:'Biofeedback 2', dur:30, qty:5} ]
+  },
+  {
+    id:'p3', name:'Paket Mixed UE + LE', type:'mixed', area:'Mixed', price:1600000, updated:'2025-05-10',
+    items:[ {name:'Motor UE1', dur:30, qty:5}, {name:'Motor LE1', dur:30, qty:5} ]
+  },
+  {
+    id:'p4', name:'Paket NMES Ekonomi', type:'nmes', area:'UE', price:800000, updated:'2025-05-08',
+    items:[ {name:'Motor UE1', dur:30, qty:5} ]
+  },
+  {
+    id:'p5', name:'Paket LE Focus', type:'nmes', area:'LE', price:950000, updated:'2025-05-07',
+    items:[ {name:'Motor LE2', dur:30, qty:6} ]
+  }
+];
+const list = document.getElementById('list');
+const search = document.getElementById('search');
+const sortBy = document.getElementById('sortBy');
+let selected = null;
+
+/* ---------- Render ---------- */
+function rp(n){ return n.toLocaleString('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}); }
+function totalMin(pkg){ return pkg.items.reduce((s,it)=>s+it.dur*it.qty,0); }
+function totalSessions(pkg){ return pkg.items.reduce((s,it)=>s+it.qty,0); }
+
+function cardTemplate(pkg){
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.dataset.id = pkg.id;
+  card.dataset.type = pkg.type;
+  card.dataset.area = pkg.area;
+  card.dataset.duration = totalMin(pkg);
+  card.dataset.price = pkg.price;
+  card.dataset.updated = pkg.updated;
+
+  card.innerHTML = `
+    <div class="cardHead">
+      <input type="radio" class="radio" name="pick" ${selected===pkg.id?'checked':''} />
+      <div class="grow">
+        <div class="pname">${pkg.name}</div>
+        <div class="ptags">
+          <span class="badge">${pkg.type.toUpperCase()}</span>
+          <span class="badge">${pkg.area}</span>
+          <span class="badge">${totalSessions(pkg)} sesi</span>
+        </div>
+      </div>
+      <button class="more" title="Detail">Detail</button>
+    </div>
+    <ul class="items">
+      ${pkg.items.map(it=>`
+        <li>
+          <span class="itemname">${it.name}</span>
+          <span class="chipmini">⏱ ${it.dur} mnt</span>
+          <span class="qty">× ${it.qty}</span>
+        </li>`).join('')}
+    </ul>
+    <div class="footer">
+      <span class="total">Total <b>${totalMin(pkg)} mnt</b></span>
+      <span class="price">${rp(pkg.price)}</span>
+    </div>
+  `;
+
+  const radio = card.querySelector('.radio');
+  const highlight = () => {
+    document.querySelectorAll('.card').forEach(c=>c.classList.remove('selected'));
+    card.classList.add('selected');
+    selected = pkg.id;
+    updateSummary();
+  };
+  radio.addEventListener('change', highlight);
+  card.addEventListener('click', e=>{
+    if(e.target.closest('.more')){ alert(`Deskripsi paket:\n${pkg.name}\n${totalSessions(pkg)} sesi • ${totalMin(pkg)} menit`); return; }
+    if(!radio.checked){ radio.checked = true; highlight(); }
+  });
+
+  if(selected===pkg.id) card.classList.add('selected');
+  return card;
+}
+
+function renderList(data){
+  list.innerHTML = '';
+  const frag = document.createDocumentFragment();
+  data.forEach(p=>frag.appendChild(cardTemplate(p)));
+  list.appendChild(frag);
+}
+
+/* ---------- Filter, sort, search ---------- */
+function applySearchSortFilter(){
+  const q = search.value.trim().toLowerCase();
+  let data = PACKAGES.filter(p=>{
+    if(q){
+      const hay = (p.name + ' ' + p.items.map(i=>i.name).join(' ')).toLowerCase();
+      if(!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  // sheet filters
+  const types = getSet('type');
+  const areas = getSet('area');
+  const dMin = +document.getElementById('durMin').value || 0;
+  const dMax = +document.getElementById('durMax').value || Number.MAX_SAFE_INTEGER;
+  const pMin = +document.getElementById('priceMin').value || 0;
+  const pMax = +document.getElementById('priceMax').value || Number.MAX_SAFE_INTEGER;
+  const kw   = document.getElementById('kw').value.trim().toLowerCase();
+
+  data = data.filter(pkg=>{
+    const dur = totalMin(pkg);
+    const nameBlob = (pkg.name + ' ' + pkg.items.map(i=>i.name).join(' ')).toLowerCase();
+    if(types.size && !types.has(pkg.type)) return false;
+    if(areas.size && !areas.has(pkg.area)) return false;
+    if(!(dur>=dMin && dur<=dMax)) return false;
+    if(!(pkg.price>=pMin && pkg.price<=pMax)) return false;
+    if(kw && !nameBlob.includes(kw)) return false;
+    return true;
+  });
+
+  // sort
+  const s = sortBy.value;
+  data.sort((a,b)=>{
+    if(s==='recent') return new Date(b.updated)-new Date(a.updated);
+    if(s==='price_asc') return a.price-b.price;
+    if(s==='price_desc') return b.price-a.price;
+    if(s==='dur_desc') return totalMin(b)-totalMin(a);
+    if(s==='dur_asc') return totalMin(a)-totalMin(b);
+    return 0;
+  });
+
+  renderList(data);
+  document.getElementById('resCount').textContent = data.length + ' paket';
+}
+
+search.addEventListener('input', applySearchSortFilter);
+sortBy.addEventListener('change', applySearchSortFilter);
+
+/* ---------- Sheet ---------- */
+const sheet = document.getElementById('sheet');
+function toggleSheet(open){ sheet.classList.toggle('open', open); }
+document.getElementById('openFilter').addEventListener('click', ()=>toggleSheet(true));
+function getSet(name){ return new Set([...document.querySelectorAll(`[name="${name}"]:checked`)].map(i=>i.value)); }
+function applyFilter(){ toggleSheet(false); applySearchSortFilter(); }
+function resetFilter(){
+  document.querySelectorAll('#sheet input[type="checkbox"]').forEach(i=>i.checked=false);
+  ['durMin','durMax','priceMin','priceMax','kw'].forEach(id=>document.getElementById(id).value='');
+  applyFilter();
+}
+
+/* ---------- Summary / CTA ---------- */
+const sumText = document.getElementById('sumText');
+const pill = document.getElementById('pill');
+const cta = document.getElementById('cta');
+
+function updateSummary(){
+  const pkg = PACKAGES.find(p=>p.id===selected);
+  if(!pkg){ sumText.textContent='Belum ada'; pill.classList.add('hidden'); cta.disabled=true; return; }
+  sumText.textContent = `${pkg.name} • ${totalSessions(pkg)} sesi • ${totalMin(pkg)} mnt • ${rp(pkg.price)}`;
+  pill.textContent = pkg.type.toUpperCase() + ' • ' + pkg.area;
+  pill.classList.remove('hidden');
+  cta.disabled = false;
+}
+
+cta.addEventListener('click', ()=>{
+  const pkg = PACKAGES.find(p=>p.id===selected);
+  alert('LANJUT ke konfirmasi:\n' + JSON.stringify({
+    paket: pkg?.name, total_menit: totalMin(pkg), sesi: totalSessions(pkg), harga: rp(pkg.price)
+  }, null, 2));
+});
+
+/* ---------- Init ---------- */
+applySearchSortFilter();
+updateSummary();
+</script>
+</body>
+</html>
