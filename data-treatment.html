@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Data Treatment – Mockup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#f7f6f2;
+      --surface:#ffffff;
+      --border:#e6ebee;
+      --muted:#6b7c7d;
+      --text:#0f1c1d;
+      --accent:#1a686a;       /* brand teal */
+      --accent-2:#17464a;     /* dark teal */
+      --shadow:0 8px 24px rgba(17,24,39,.08);
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--text);background:var(--bg);line-height:1.45}
+
+    /* Appbar */
+    .appbar{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:10px;padding:14px 16px;background:var(--surface);border-bottom:1px solid var(--border)}
+    .back{appearance:none;border:0;border-radius:10px;width:36px;height:36px;background:#eaf2f3;color:var(--accent);display:grid;place-items:center;font-size:18px;cursor:pointer}
+    .title{font-weight:700}
+    .step{margin-left:auto;color:var(--muted);font-size:12px}
+
+    .wrap{max-width:760px;margin:12px auto 140px;padding:0 16px;display:grid;gap:16px}
+
+    /* Section card */
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
+    .card h3{margin:0 0 8px;font-size:16px}
+    .hint{font-size:12px;color:var(--muted);margin-top:6px}
+
+    /* Location grid */
+    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    @media(min-width:560px){.grid{grid-template-columns:repeat(3,1fr)}}
+    .loc{position:relative;display:flex;gap:10px;align-items:center;padding:12px;border:1px solid var(--border);border-radius:14px;background:#fff;cursor:pointer;user-select:none;transition:box-shadow .15s,border-color .15s}
+    .loc:focus-visible{outline:2px solid #9bd0d0}
+    .loc .icon{width:38px;height:38px;border-radius:10px;background:#eaf2f3;display:grid;place-items:center;color:var(--accent)}
+    .loc .name{font-weight:600}
+    .loc small{display:block;color:var(--muted);font-size:12px}
+    .loc:hover{border-color:#bfd9d9}
+    .loc.active{background:#f3fbfb;border-color:#c8e6e6;box-shadow:0 6px 14px rgba(0,0,0,.06)}
+    .badgeN{position:absolute;top:8px;right:8px;min-width:20px;height:20px;border-radius:999px;background:var(--accent);color:#fff;font-size:12px;display:grid;place-items:center;padding:0 6px}
+
+    /* Program picker */
+    .picker{display:flex;gap:8px;align-items:center}
+    .picker-btn{appearance:none;border:1px solid var(--border);background:#fff;border-radius:12px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;width:100%;cursor:pointer}
+    .picker-btn .placeholder{color:var(--muted)}
+
+    /* Duration chips */
+    .chips{display:flex;flex-wrap:wrap;gap:8px}
+    .chip{appearance:none;border:1px solid var(--border);background:#fff;border-radius:999px;padding:8px 12px;cursor:pointer;font-weight:600}
+    .chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .num{appearance:none;border:1px solid var(--border);border-radius:10px;padding:8px 10px;width:120px}
+
+    /* Sliders with bubble */
+    .sliderRow{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
+    .sliderWrap{position:relative;padding:8px 0}
+    .bubble{position:absolute;transform:translate(-50%,-130%);background:#000;color:#fff;font-size:12px;padding:3px 6px;border-radius:6px;white-space:nowrap}
+    .range{width:100%}
+    .stepper{display:flex;gap:6px}
+    .stepper button{appearance:none;border:1px solid var(--border);background:#f6f8f9;border-radius:10px;width:36px;height:36px;font-weight:700;cursor:pointer}
+
+    /* Sticky summary */
+    .sticky{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--border);z-index:50}
+    .sticky .inner{max-width:760px;margin:0 auto;padding:10px 16px;display:grid;gap:10px}
+    .totline{display:flex;justify-content:space-between;align-items:center}
+    .muted{color:var(--muted)}
+    .cta{appearance:none;border:0;background:var(--accent-2);color:#fff;font-weight:800;padding:14px 16px;border-radius:12px;letter-spacing:.3px;cursor:pointer}
+    .cta[disabled]{opacity:.5;cursor:not-allowed}
+    .warn{color:#9a3412;background:#fff7ed;border:1px solid #fed7aa;padding:2px 8px;border-radius:999px;font-size:12px}
+
+    /* Sheet */
+    .sheet{position:fixed;inset:0;display:none;z-index:60}
+    .sheet.open{display:block}
+    .sheet .backdrop{position:absolute;inset:0;background:rgba(0,0,0,.28)}
+    .sheet .panel{position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:20px 20px 0 0;box-shadow:var(--shadow);padding:16px}
+    .tabs{display:flex;gap:6px;margin-bottom:10px}
+    .tabs button{appearance:none;border:1px solid var(--border);background:#f8fafb;border-radius:999px;padding:8px 12px;cursor:pointer;font-weight:600}
+    .tabs button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .search{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;margin-bottom:10px}
+    .radioList{max-height:44vh;overflow:auto;border:1px solid var(--border);border-radius:12px}
+    .radioItem{display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid var(--border)}
+    .radioItem:last-child{border-bottom:0}
+    .radioItem small{color:var(--muted)}
+    .sheetActions{display:flex;justify-content:space-between;gap:10px;margin-top:10px}
+    .btn{appearance:none;border:1px solid var(--border);background:#fff;border-radius:12px;padding:10px 12px;font-weight:700;cursor:pointer}
+    .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  </style>
+</head>
+<body>
+  <header class="appbar">
+    <button class="back" aria-label="Kembali">←</button>
+    <div class="title">Data Treatment</div>
+    <div class="step">Step 1/3</div>
+  </header>
+
+  <main class="wrap">
+    <!-- 1. Lokasi Terapi -->
+    <section class="card" id="sec-loc">
+      <h3>1) Pilih lokasi terapi</h3>
+      <div class="grid" id="locGrid"></div>
+      <div class="hint">Pilih satu atau lebih lokasi. Tekan lagi untuk batal.</div>
+    </section>
+
+    <!-- 2. Program -->
+    <section class="card">
+      <h3>2) Pilih program (NMES/BFES)</h3>
+      <div class="picker">
+        <button id="programBtn" class="picker-btn" aria-haspopup="dialog">
+          <span id="programLabel" class="placeholder">Pilih Program (wajib)</span>
+          <span>▾</span>
+        </button>
+      </div>
+      <div class="hint">Favorit/terakhir dipakai akan ditampilkan teratas.</div>
+    </section>
+
+    <!-- 3. Durasi -->
+    <section class="card">
+      <h3>3) Durasi terapi</h3>
+      <div class="chips" id="durChips"></div>
+      <div class="hint" id="etaText">Selesai ~—:—</div>
+    </section>
+
+    <!-- 4. Intensitas kanal -->
+    <section class="card">
+      <h3>4) Atur intensitas kanal</h3>
+      <div class="sliderRow">
+        <div class="sliderWrap">
+          <input id="intensity" class="range" type="range" min="0" max="100" step="5" value="30">
+          <div id="bubble1" class="bubble">30</div>
+        </div>
+        <div class="stepper">
+          <button data-step="-5">−</button>
+          <button data-step="+5">＋</button>
+        </div>
+      </div>
+      <div class="hint">Langkah 5. Naikkan secara bertahap sampai respon otot terlihat.</div>
+    </section>
+
+    <!-- 5. Ambang Biofeedback -->
+    <section class="card">
+      <h3>5) Atur ambang biofeedback</h3>
+      <div class="sliderRow">
+        <div class="sliderWrap">
+          <input id="threshold" class="range" type="range" min="0" max="50" step="1" value="15">
+          <div id="bubble2" class="bubble">15</div>
+        </div>
+        <div class="stepper">
+          <button data-step="-1" data-target="threshold">−</button>
+          <button data-step="+1" data-target="threshold">＋</button>
+        </div>
+      </div>
+      <div class="hint">Semakin tinggi = pemicu lebih sulit. Sesuaikan dengan kemampuan pasien.</div>
+    </section>
+  </main>
+
+  <!-- Sticky summary -->
+  <div class="sticky">
+    <div class="inner">
+      <div class="totline">
+        <div>
+          <div class="muted">Ringkasan</div>
+          <div style="font-weight:800" id="sumText">0 mnt • 0 lokasi • program: —</div>
+        </div>
+        <div id="warn" class="warn" style="display:none">Lengkapi lokasi & program</div>
+      </div>
+      <button id="cta" class="cta" disabled>LANJUT (0 mnt)</button>
+    </div>
+  </div>
+
+  <!-- Bottom Sheet: Program Picker -->
+  <div class="sheet" id="sheet">
+    <div class="backdrop" onclick="toggleSheet(false)"></div>
+    <div class="panel" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+      <h3 id="sheetTitle" style="margin:0 0 10px">Pilih Program</h3>
+      <div class="tabs" id="progTabs">
+        <button class="active" data-cat="nmes">NMES</button>
+        <button data-cat="bfes">Biofeedback</button>
+      </div>
+      <input id="search" class="search" placeholder="Cari program…" />
+      <div class="radioList" id="radioList"></div>
+      <div class="sheetActions">
+        <button class="btn" onclick="toggleSheet(false)">Batal</button>
+        <button class="btn primary" id="applyBtn">Terapkan</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ------- DATA -------
+    const LOCATIONS = [
+      { id:'wff_flex',  name:'Wrist & finger flexion',  short:'UE flex' },
+      { id:'knee_ext',  name:'Knee extension',         short:'LE ext' },
+      { id:'wff_ext',   name:'Wrist & finger extension', short:'UE ext' },
+      { id:'elbow_flex',name:'Elbow flexion',          short:'UE flex' },
+      { id:'shoulder',  name:'Shoulder subluxation',   short:'Shoulder' },
+      { id:'ankle_dorsi',name:'Ankle dorsiflexion',    short:'LE dorsi' },
+      { id:'elbow_ext', name:'Elbow extension',        short:'UE ext' }
+    ];
+
+    const PROGRAMS = {
+      nmes: [
+        { id:'motor_ue1', label:'Motor UE 1', desc:'Stimulasi otot lengan – kanal 2' },
+        { id:'motor_ue2', label:'Motor UE 2', desc:'Otot lengan – variasi 2' },
+        { id:'motor_le1', label:'Motor LE 1', desc:'Otot tungkai – kanal 2' },
+        { id:'motor_le2', label:'Motor LE 2', desc:'Otot tungkai – variasi 2' },
+      ],
+      bfes: [
+        { id:'bf1', label:'Biofeedback 1', desc:'Preset dasar' },
+        { id:'bf2', label:'Biofeedback 2', desc:'Sensitif sedang' },
+        { id:'bf3', label:'Biofeedback 3', desc:'Sensitif tinggi' },
+        { id:'sens', label:'Sensitive', desc:'Mode sensitif' },
+        { id:'sen1', label:'Sensory 1', desc:'Rangsang sensorik ringan' },
+        { id:'sen2', label:'Sensory 2', desc:'Rangsang sensorik kuat' },
+        { id:'tone', label:'Sensory/Tone', desc:'Pemeliharaan tonus' },
+      ]
+    };
+
+    // ------- LOCATION GRID -------
+    const grid = document.getElementById('locGrid');
+    let selectedLoc = [];
+
+    function locIcon(){return `<svg viewBox='0 0 24 24' width='20' height='20' fill='none' stroke='currentColor' stroke-width='2'><rect x='5' y='5' width='14' height='14' rx='3'/><path d='M8 12h8M12 8v8'/></svg>`}
+
+    function renderLoc(){
+      grid.innerHTML = '';
+      LOCATIONS.forEach(loc => {
+        const el = document.createElement('button');
+        el.type='button';
+        el.className='loc';
+        el.dataset.id = loc.id;
+        el.setAttribute('aria-pressed', selectedLoc.includes(loc.id));
+        if(selectedLoc.includes(loc.id)) el.classList.add('active');
+        el.innerHTML = `<div class='icon'>${locIcon()}</div><div><div class='name'>${loc.name}</div></div>`;
+        const idx = selectedLoc.indexOf(loc.id);
+        if(idx>=0){
+          const b = document.createElement('div'); b.className='badgeN'; b.textContent = idx+1; el.appendChild(b);
+        }
+        el.addEventListener('click',()=>toggleLoc(loc.id));
+        grid.appendChild(el);
+      })
+    }
+
+    function toggleLoc(id){
+      const i = selectedLoc.indexOf(id);
+      if(i>=0) selectedLoc.splice(i,1); else selectedLoc.push(id);
+      renderLoc();
+      recompute();
+    }
+
+    // ------- PROGRAM PICKER (sheet) -------
+    const programBtn = document.getElementById('programBtn');
+    const programLabel = document.getElementById('programLabel');
+    const sheet = document.getElementById('sheet');
+    const radioList = document.getElementById('radioList');
+    const tabs = document.getElementById('progTabs');
+    const search = document.getElementById('search');
+    const applyBtn = document.getElementById('applyBtn');
+
+    let activeCat = 'nmes';
+    let tempSelection = null; // id sementara di sheet
+    let selectedProgram = null; // {id,label}
+
+    programBtn.addEventListener('click',()=>{ tempSelection = selectedProgram?.id || null; buildList(); toggleSheet(true); });
+    tabs.addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; tabs.querySelectorAll('button').forEach(x=>x.classList.remove('active')); b.classList.add('active'); activeCat=b.dataset.cat; search.value=''; buildList(); });
+    search.addEventListener('input',buildList);
+    applyBtn.addEventListener('click',()=>{ if(!tempSelection) return; const item=[...PROGRAMS.nmes,...PROGRAMS.bfes].find(p=>p.id===tempSelection); selectedProgram = {id:item.id,label:item.label,cat:activeCat}; programLabel.textContent = item.label; programLabel.classList.remove('placeholder'); toggleSheet(false); recompute(); });
+
+    function buildList(){
+      radioList.innerHTML='';
+      const data = PROGRAMS[activeCat].filter(p=>p.label.toLowerCase().includes(search.value.toLowerCase()));
+      data.forEach(p=>{
+        const row = document.createElement('label');
+        row.className='radioItem';
+        row.innerHTML = `<div><div style='font-weight:600'>${p.label}</div><small>${p.desc||''}</small></div><input type='radio' name='prog' ${tempSelection===p.id?'checked':''}>`;
+        row.addEventListener('click',()=>{ tempSelection=p.id; buildList(); });
+        radioList.appendChild(row);
+      });
+    }
+
+    function toggleSheet(open){ sheet.classList.toggle('open', open); }
+
+    // ------- DURATION CHIPS -------
+    const durChips = document.getElementById('durChips');
+    const etaText = document.getElementById('etaText');
+
+    const DURATIONS=[15,30,45,60,'Lainnya'];
+    let duration = 30;
+
+    function buildDur(){
+      durChips.innerHTML='';
+      DURATIONS.forEach(d=>{
+        if(typeof d==='number'){
+          const b = document.createElement('button');
+          b.className='chip';
+          if(duration===d) b.classList.add('active');
+          b.textContent = `${d} menit`;
+          b.addEventListener('click',()=>{ duration=d; buildDur(); recompute(); });
+          durChips.appendChild(b);
+        } else {
+          const wrap = document.createElement('div');
+          wrap.style.display='flex';wrap.style.gap='8px';wrap.style.alignItems='center';
+          const b = document.createElement('button'); b.className='chip'; b.textContent='Lainnya';
+          const input = document.createElement('input'); input.className='num'; input.type='number'; input.min='5'; input.step='5'; input.placeholder='menit'; input.value = (typeof duration==='number' && DURATIONS.includes(duration))? '' : duration;
+          b.addEventListener('click',()=>{ input.focus(); });
+          input.addEventListener('input',()=>{ const v=+input.value||0; if(v>0){ duration=v; document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active')); recompute(); } });
+          wrap.appendChild(b); wrap.appendChild(input); durChips.appendChild(wrap);
+        }
+      });
+    }
+
+    // ------- SLIDERS bubbles & steppers -------
+    const intensity = document.getElementById('intensity');
+    const threshold = document.getElementById('threshold');
+    const bubble1 = document.getElementById('bubble1');
+    const bubble2 = document.getElementById('bubble2');
+
+    function setBubble(range, bubble){
+      const val = +range.value; bubble.textContent = val; const pct = (val - range.min)/(range.max - range.min); bubble.style.left = `calc(${pct*100}% + ${8 - pct*16}px)`; // keep bubble centered near thumb
+    }
+    [intensity,threshold].forEach(r=>{ setBubble(r, r===intensity?bubble1:bubble2); r.addEventListener('input',()=> setBubble(r, r===intensity?bubble1:bubble2)); });
+
+    document.querySelectorAll('.stepper button').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const target = btn.dataset.target==='threshold'?threshold:intensity;
+        const step = parseInt(btn.dataset.step,10);
+        const val = Math.max(+target.min, Math.min(+target.max, +target.value + step));
+        target.value = val; setBubble(target, target===intensity?bubble1:bubble2);
+      });
+    });
+
+    // ------- SUMMARY -------
+    const sumText = document.getElementById('sumText');
+    const cta = document.getElementById('cta');
+    const warn = document.getElementById('warn');
+
+    function recompute(){
+      // Total waktu = durasi x jumlah lokasi
+      const nLoc = selectedLoc.length;
+      const totalMin = duration * Math.max(1, nLoc||0);
+
+      const programName = selectedProgram? selectedProgram.label : '—';
+      sumText.textContent = `${totalMin} mnt • ${nLoc} lokasi • program: ${programName}`;
+      cta.textContent = `LANJUT (${totalMin} mnt)`;
+
+      // ETA (perkiraan selesai): dari sekarang + totalMin
+      const now = new Date();
+      const eta = new Date(now.getTime() + totalMin*60000);
+      const hh = `${eta.getHours()}`.padStart(2,'0');
+      const mm = `${eta.getMinutes()}`.padStart(2,'0');
+      etaText.textContent = `Selesai ~${hh}:${mm}`;
+
+      const ready = nLoc>0 && !!selectedProgram;
+      cta.disabled = !ready;
+      warn.style.display = ready? 'none':'inline-flex';
+    }
+
+    // ------- INIT -------
+    function init(){ renderLoc(); buildDur(); recompute(); }
+    init();
+  </script>
+</body>
+</html>
