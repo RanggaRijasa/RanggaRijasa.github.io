@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>STIMEL • Struk / Laporan Transaksi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#f7f6f2; --surface:#fff; --border:#e6ebee; --text:#0f1c1d; --muted:#6b7c7d;
+      --accent:#1a686a; --accent2:#17464a; --shadow:0 8px 24px rgba(17,24,39,.08); --r:16px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--text);background:var(--bg)}
+
+    .appbar{position:sticky;top:0;z-index:20;background:var(--accent2);color:#fff;padding:12px 16px;border-bottom-left-radius:14px;border-bottom-right-radius:14px;display:flex;align-items:center;gap:10px}
+    .appbar b{font-size:16px}
+    .wrap{max-width:760px;margin:14px auto 140px;padding:0 16px;display:grid;gap:14px}
+
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);padding:14px}
+    .row{display:flex;gap:10px;align-items:center}
+    .between{display:flex;align-items:center;justify-content:space-between}
+    .muted{color:var(--muted)}
+    .badge{font-size:12px;border:1px solid var(--border);border-radius:999px;padding:3px 8px;background:#eef7f7;color:#136666}
+
+    /* header blocks */
+    .grid{display:grid;grid-template-columns:1fr;gap:12px}
+    @media(min-width:640px){.grid{grid-template-columns:1fr 1fr}}
+    .kv{display:grid;grid-template-columns:120px 1fr;gap:6px;font-size:13px}
+    .kv .k{color:var(--muted)}
+
+    /* table */
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:8px 6px;border-bottom:1px dashed var(--border);vertical-align:top}
+    th{text-align:left;color:var(--muted);font-weight:600;font-size:12px}
+    .t-right{text-align:right}
+
+    .section-title{font-weight:800;margin:0 0 6px}
+    .hint{font-size:12px;color:var(--muted)}
+
+    /* settings chips under item title */
+    .desc .title{font-weight:700}
+    .settings{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+    .settings .chip{
+      display:inline-flex;gap:6px;align-items:center;
+      font-size:12px;color:var(--muted);
+      background:#fbfbfb;border:1px solid var(--border);
+      padding:3px 8px;border-radius:999px;
+    }
+    .settings .chip b{color:var(--text)}
+    .settings .chip svg{width:14px;height:14px}
+
+    .totals{display:grid;gap:6px}
+    .totals .r{display:flex;justify-content:space-between}
+    .grand{font-weight:800}
+
+    /* footer actions */
+    .actions{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--border);padding:10px 16px;display:flex;gap:10px;justify-content:flex-end;z-index:30}
+    .btn{appearance:none;border:1px solid var(--border);background:#fff;border-radius:12px;padding:10px 14px;font-weight:700;cursor:pointer}
+    .btn.primary{background:var(--accent2);border-color:var(--accent2);color:#fff}
+
+    /* print */
+    @media print{
+      .appbar,.actions{display:none}
+      body{background:#fff}
+      .wrap{margin:0 auto;padding:0}
+      .card{box-shadow:none;border:1px solid #ddd}
+    }
+  </style>
+</head>
+<body>
+  <header class="appbar">
+    <button onclick="history.back()" class="btn" style="border-color:rgba(255,255,255,.4);background:transparent;color:#fff">←</button>
+    <b>Struk / Laporan Transaksi</b>
+    <span style="margin-left:auto" class="badge" id="statusBadge">LUNAS</span>
+  </header>
+
+  <main class="wrap" id="root">
+    <!-- Header info -->
+    <section class="card grid">
+      <div>
+        <div class="section-title">Informasi Klinik</div>
+        <div class="kv">
+          <div class="k">Klinik</div><div>STIMEL Clinic</div>
+          <div class="k">Alamat</div><div>Jl. Kesehatan No. 12, Jakarta</div>
+          <div class="k">Telepon</div><div>021-555-1234</div>
+        </div>
+      </div>
+      <div>
+        <div class="section-title">Pasien & Transaksi</div>
+        <div class="kv">
+          <div class="k">Nama Pasien</div><div id="pName">Budi Santoso</div>
+          <div class="k">Tanggal</div><div id="pDate">18/5/2025 • 13:30</div>
+          <div class="k">No. Transaksi</div><div id="pInv">INV-2025-0518-0001</div>
+          <div class="k">Kasir/DPJP</div><div id="pBy">dr. Andini</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Ringkasan item -->
+    <section class="card">
+      <div class="section-title">Ringkasan Treatment & Paket</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Deskripsi</th>
+            <th class="t-right">Qty</th>
+            <th class="t-right">Durasi</th>
+            <th class="t-right">Harga</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyItems"></tbody>
+      </table>
+      <div class="between" style="margin-top:8px">
+        <span class="hint">Total durasi</span>
+        <b id="totalDur">0 min • 0 item</b>
+      </div>
+    </section>
+
+    <!-- Pemakaian paket -->
+    <section class="card">
+      <div class="section-title">Pemakaian Paket Hari Ini</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Item Paket</th>
+            <th class="t-right">Dipakai</th>
+            <th class="t-right">Sisa</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyUse"></tbody>
+      </table>
+      <div class="hint" style="margin-top:6px">Sisa akan diperbarui setelah transaksi dikonfirmasi.</div>
+    </section>
+
+    <!-- Rincian tagihan -->
+    <section class="card">
+      <div class="section-title">Rincian Tagihan</div>
+      <div class="totals">
+        <div class="r"><span>Subtotal</span><span id="subTotal">Rp 0</span></div>
+        <div class="r"><span>Diskon promo (<span id="discLabel">0%</span>)</span><span id="discAmt" style="color:#0a7a6f">− Rp 0</span></div>
+        <div class="r"><span>PPN 11%</span><span id="taxAmt">Rp 0</span></div>
+        <div class="r grand"><span>Grandtotal</span><span id="grandTotal">Rp 0</span></div>
+      </div>
+    </section>
+
+    <!-- Catatan klinis -->
+    <section class="card">
+      <div class="section-title">Catatan Klinis</div>
+      <div id="notes" class="muted">Tidak ada catatan tambahan.</div>
+    </section>
+
+    <!-- Tanda tangan -->
+    <section class="card">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <div class="muted">Tanda tangan Pasien</div>
+          <div style="height:100px;border:1px dashed var(--border);border-radius:10px"></div>
+        </div>
+        <div>
+          <div class="muted">Tanda tangan Dokter/Kasir</div>
+          <div style="height:100px;border:1px dashed var(--border);border-radius:10px"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="actions">
+    <button class="btn" id="btnShare">Share</button>
+    <button class="btn" onclick="window.print()">Download / Cetak</button>
+    <button class="btn primary" id="btnDone">Selesai</button>
+  </div>
+
+  <script>
+    // ===== Sample payload dari halaman recap =====
+    // Tambahkan field settings bila item adalah treatment (bukan paket)
+    const payload = {
+      patient:{ name:'Budi Santoso' },
+      datetime:'18/5/2025 • 13:30',
+      invoice:'INV-2025-0518-0001',
+      cashier:'dr. Andini',
+      status:'LUNAS',
+      items:[
+        {
+          name:'Motor UE 1',
+          minutes:30, qty:1, price: 90000,
+          settings:{ loc:'Wrist & finger flexion', program:'Motor UE 1', channel:30 } // NMES
+        },
+        {
+          name:'Paket NMES Standard (300 min)',
+          minutes:300, qty:1, price:1500000
+          // paket: biasanya tanpa settings per-item
+        },
+        {
+          name:'Biofeedback 3',
+          minutes:30, qty:1, price: 120000,
+          settings:{ loc:'Elbow flexion', program:'Biofeedback 3', channel:30, threshold:15 } // BFES
+        }
+      ],
+      packageUse:[
+        { name:'Motor UE1', used:1, remaining:4 },
+        { name:'Motor UE2', used:0, remaining:5 },
+      ],
+      pricing:{ discountPct:8, taxPct:11 },
+      notes:'—'
+    };
+
+    const el = sel => document.querySelector(sel);
+    const fmt = n => n.toLocaleString('id-ID', {style:'currency', currency:'IDR', maximumFractionDigits:0});
+
+    // svg helpers
+    const iPin   = '<path d="M12 21s7-4.35 7-10a7 7 0 10-14 0c0 5.65 7 10 7 10Z"/><circle cx="12" cy="11" r="2"/>';
+    const iList  = '<path d="M4 6h16M4 12h16M4 18h16"/>';
+    const iKnob  = '<path d="M4 12h12"/><circle cx="18" cy="12" r="2"/>';
+    const iThresh= '<path d="M4 12h16"/><circle cx="8" cy="12" r="2"/>';
+    function chip(icon, html){
+      return `<span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${icon}</svg>${html}</span>`;
+    }
+    function settingsChips(s){
+      if(!s) return '';
+      const arr = [];
+      if(s.loc)       arr.push(chip(iPin, `<b>${s.loc}</b>`));
+      if(s.program)   arr.push(chip(iList, `<b>${s.program}</b>`));
+      if(typeof s.channel==='number')   arr.push(chip(iKnob,  `Channel <b>${s.channel}</b>`));
+      if(typeof s.threshold==='number') arr.push(chip(iThresh,`Ambang <b>${s.threshold}</b>`));
+      return arr.length ? `<div class="settings">${arr.join('')}</div>` : '';
+    }
+
+    function render(){
+      el('#pName').textContent = payload.patient.name;
+      el('#pDate').textContent = payload.datetime;
+      el('#pInv').textContent = payload.invoice;
+      el('#pBy').textContent = payload.cashier;
+      el('#statusBadge').textContent = payload.status;
+
+      // Items table
+      const tbody = el('#tbodyItems');
+      tbody.innerHTML = '';
+      let totalMin = 0, totalItem = 0, sub = 0;
+      payload.items.forEach(it => {
+        totalMin += (it.minutes||0) * (it.qty||0);
+        totalItem += it.qty||0;
+        sub += (it.price||0) * (it.qty||0);
+
+        const descHTML = `
+          <div class="desc">
+            <div class="title">${it.name}</div>
+            ${settingsChips(it.settings)}
+          </div>`;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${descHTML}</td>
+          <td class="t-right">× ${it.qty}</td>
+          <td class="t-right">${it.minutes||0} min</td>
+          <td class="t-right">${fmt(it.price||0)}</td>`;
+        tbody.appendChild(tr);
+      });
+      el('#totalDur').textContent = `${totalMin} min • ${totalItem} item`;
+
+      // Package use
+      const tbodyUse = el('#tbodyUse');
+      tbodyUse.innerHTML = '';
+      payload.packageUse.forEach(p => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${p.name}</td>
+          <td class="t-right">${p.used}</td>
+          <td class="t-right">${p.remaining}</td>`;
+        tbodyUse.appendChild(tr);
+      });
+
+      // Totals
+      const disc = Math.round(sub * (payload.pricing.discountPct||0) / 100);
+      const taxedBase = sub - disc;
+      const tax = Math.round(taxedBase * (payload.pricing.taxPct||0) / 100);
+      const grand = taxedBase + tax;
+
+      el('#subTotal').textContent = fmt(sub);
+      el('#discLabel').textContent = `${payload.pricing.discountPct||0}%`;
+      el('#discAmt').textContent = `- ${fmt(disc)}`;
+      el('#taxAmt').textContent = fmt(tax);
+      el('#grandTotal').textContent = fmt(grand);
+
+      el('#notes').textContent = payload.notes || 'Tidak ada catatan tambahan.';
+    }
+
+    render();
+
+    // Share (Web Share API)
+    el('#btnShare').addEventListener('click', async () => {
+      const text = `Struk STIMEL\n${payload.patient.name}\n${payload.datetime}\nTotal: ` + el('#grandTotal').textContent;
+      try{
+        if(navigator.share){
+          await navigator.share({ title:'Struk STIMEL', text });
+        } else {
+          await navigator.clipboard.writeText(text);
+          alert('Ringkasan disalin ke clipboard.');
+        }
+      }catch(e){ console.log(e); }
+    });
+
+    el('#btnDone').addEventListener('click', ()=> alert('Tutup / kembali ke daftar transaksi'));
+  </script>
+</body>
+</html>
